@@ -1,5 +1,7 @@
 const API_URL = "https://demografix-c63625879fc2.herokuapp.com/api/classify/";
 
+console.log("Script loaded and initializing...");
+
 const form = document.getElementById("predict-form");
 const nameInput = document.getElementById("name-input");
 const statusMessage = document.getElementById("status-message");
@@ -10,6 +12,13 @@ const resultProbability = document.getElementById("result-probability");
 const resultSampleSize = document.getElementById("result-sample-size");
 const resultConfidence = document.getElementById("result-confidence");
 const confidencePill = document.getElementById("confidence-pill");
+
+console.log("Elements found:", {
+  form: !!form,
+  nameInput: !!nameInput,
+  statusMessage: !!statusMessage,
+  resultCard: !!resultCard,
+});
 
 function setStatus(message, type = "") {
   statusMessage.textContent = message;
@@ -59,6 +68,7 @@ function updateResult(data) {
 }
 
 async function predictGender(name) {
+  console.log("predictGender called with:", name);
   const trimmedName = name.trim();
 
   if (!trimmedName) {
@@ -113,16 +123,27 @@ async function predictGender(name) {
   }
 }
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  predictGender(nameInput.value);
-});
+console.log("Attaching event listeners...");
 
-nameInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
+if (form) {
+  form.addEventListener("submit", (event) => {
+    console.log("Form submit event fired");
     event.preventDefault();
     predictGender(nameInput.value);
-  }
-});
+  });
+  console.log("Form submit listener attached");
+}
 
+if (nameInput) {
+  nameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      console.log("Enter key pressed");
+      event.preventDefault();
+      predictGender(nameInput.value);
+    }
+  });
+  console.log("Name input keydown listener attached");
+}
+
+console.log("Script initialization complete");
 setStatus("Try a name like sam, alice, or james.");
