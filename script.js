@@ -76,23 +76,39 @@ async function predictGender(name) {
   setStatus("Predicting gender...", "");
 
   try {
-    const response = await fetch(`${API_URL}?name=${encodeURIComponent(trimmedName)}`);
+    console.log("Fetching from:", `${API_URL}?name=${encodeURIComponent(trimmedName)}`);
+    
+    const response = await fetch(`${API_URL}?name=${encodeURIComponent(trimmedName)}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("Response status:", response.status);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      const message =
-        errorData && errorData.message
-          ? errorData.message
-          : "Something went wrong while predicting the name.";
+      let errorMessage = "Something went wrong while predicting the name.";
+      
+      try {
+        const errorData = await response.json();
+        if (errorData && errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (e) {
+        console.error("Could not parse error response:", e);
+      }
 
-      throw new Error(message);
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
+    console.log("Response data:", data);
     updateResult(data);
     setStatus("Prediction complete.", "success");
   } catch (error) {
-    setStatus(error.message || "Unable to fetch prediction.", "error");
+    console.error("Error:", error);
+    setStatus(error.message || "Unable to fetch prediction. Check console for details.", "error");
     setResultVisible(false);
   }
 }
